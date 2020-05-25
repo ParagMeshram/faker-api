@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Faker.Data.Models;
+using FizzWare.NBuilder;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faker.Data
@@ -25,15 +26,20 @@ namespace Faker.Data
 
         public void Initialize()
         {
-            var customer = new Customer
-            {
-                ID = "xyz",
-                FirstName = "Parag",
-                LastName = "Meshram",
-                Address = "Pune"
-            };
+            var generator = new RandomGenerator();
 
-            this.Customers.Add(customer);
+
+
+            var customers = Builder<Customer>.CreateListOfSize(500)
+                                             .All()
+                                                .With(c => c.ID = generator.Guid().ToString())
+                                                .With(c => c.FirstName = Faker.Name.First())
+                                                .With(c => c.LastName = Faker.Name.Last())
+                                                .With(c => c.Address = $"{c.FirstName}.{c.LastName}@domain.com")
+                                             .Build();
+            
+            this.Customers.AddRange(customers);
+
             this.SaveChanges();
         }
     }

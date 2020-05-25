@@ -16,11 +16,13 @@ namespace Faker.Api
 
     public class Program
     {
+        private const string DATABASE_NAME = "Default";
+
         public static async Task Main(string[] args)
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: "InMemory")
-            .Options;
+                             .UseInMemoryDatabase(DATABASE_NAME)
+                             .Options;
 
             using (var context = new AppDbContext(options))
             {
@@ -28,22 +30,22 @@ namespace Faker.Api
             }
 
             await Host.CreateDefaultBuilder(args)
-                              .ConfigureWebHostDefaults(builder =>
-                               {
-                                   builder.UseStartup<Startup>();
-                               })
-                              .ConfigureServices(services =>
-                               {
-                                   services.Configure<ConsoleLifetimeOptions>(options => options.SuppressStatusMessages = true);
-                                   services.AddDbContext<AppDbContext>((options, context) => context.UseInMemoryDatabase("InMemory"));
-                                   services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>());
-                               })
-                              //   .ConfigureLogging((context, logging) =>
-                              //   {
-                              //       logging.AddConfiguration(context.Configuration);
-                              //       logging.AddConsole();
-                              //   })
-                              .RunConsoleAsync(config => config.SuppressStatusMessages = true);
+                      .ConfigureWebHostDefaults(builder =>
+                      {
+                          builder.UseStartup<Startup>();
+                      })
+                      .ConfigureServices(services =>
+                      {
+                          services.Configure<ConsoleLifetimeOptions>(options => options.SuppressStatusMessages = true);
+                          services.AddDbContext<AppDbContext>((options, context) => context.UseInMemoryDatabase(DATABASE_NAME));
+                          services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>());
+                      })
+                      //   .ConfigureLogging((context, logging) =>
+                      //   {
+                      //       logging.AddConfiguration(context.Configuration);
+                      //       logging.AddConsole();
+                      //   })
+                      .RunConsoleAsync(config => config.SuppressStatusMessages = true);
 
         }
     }
